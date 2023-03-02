@@ -58,9 +58,10 @@ def mypy(session: Session) -> None:
         "pytest",
         "importlib-resources",
         "sqlalchemy2-stubs",
+        "types-jsonschema",
         "types-python-dateutil",
-        "types-requests",
         "types-pytz",
+        "types-requests",
         "types-simplejson",
         "types-PyYAML",
     )
@@ -72,7 +73,6 @@ def mypy(session: Session) -> None:
 @session(python=python_versions)
 def tests(session: Session) -> None:
     """Execute pytest tests and compute coverage."""
-
     session.install(".[s3]")
     session.install(*test_dependencies)
 

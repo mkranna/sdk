@@ -183,7 +183,7 @@ def test_cookiecutter(session: Session) -> None:
     ]
     if len(args) == 1:
         print("ERROR:" + args[0])
-        return 0
+        return
 
     cc_build_path = "/tmp"
     tap_template = os.path.abspath(args[0])
@@ -191,11 +191,11 @@ def test_cookiecutter(session: Session) -> None:
 
     if not os.path.exists(tap_template):
         print("Tap template folder not found")
-        return 0
+        return
 
     if not os.path.isfile(replay_file):
         print("Replay file not found")
-        return 0
+        return
 
     sdk_dir = os.path.dirname(os.path.dirname(tap_template))
     cc_output_dir = os.path.basename(args[1]).replace(".json", "")

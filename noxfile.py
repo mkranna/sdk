@@ -28,7 +28,7 @@ nox.options.sessions = (
     "mypy",
     "tests",
     "doctest",
-    # "test_cookiecutter"
+    "test_cookiecutter"
 )
 test_dependencies = [
     "coverage[toml]",
@@ -174,7 +174,7 @@ def docs_serve(session: Session) -> None:
     session.run("sphinx-autobuild", *args)
 
 
-@session(python=main_python_version)
+@session(python=python_versions)
 def test_cookiecutter(session: Session) -> None:
     """Uses the tap template to build an empty cookiecutter, and runs the lint task on the created test project."""
     args = session.posargs or [

@@ -174,7 +174,7 @@ def docs_serve(session: Session) -> None:
     session.run("sphinx-autobuild", *args)
 
 
-@session(python=python_versions)
+@session(python=main_python_version)
 def test_cookiecutter(session: Session) -> None:
     """Uses the tap template to build an empty cookiecutter, and runs the lint task on the created test project."""
     args = session.posargs or [
@@ -221,11 +221,8 @@ def test_cookiecutter(session: Session) -> None:
         if os.path.basename(path).startswith("tap") or os.path.basename(path).startswith("target"):
             library_name = os.path.basename(path)
 
-    session.run("poetry", "run", "black", library_name, external=True)
-    session.run("poetry", "run", "isort", library_name, external=True)
-    session.run("poetry", "run", "flake8", library_name, external=True)
-    session.run("poetry", "run", "mypy", library_name, external=True)
+    for argument in ["black", "isort", "flake8", "mypy"]:
+        session.run("poetry", "run", argument, library_name, external=True)
 
     if len(args) < 3 or int(args[2]) == 1:
         session.run("poetry", "run", "tox", "-e", "lint", external=True)
-    

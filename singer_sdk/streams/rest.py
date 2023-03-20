@@ -182,7 +182,8 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
         ):
             msg = self.response_error_message(response)
             raise RetriableAPIError(msg, response)
-        elif 400 <= response.status_code < 500:
+
+        if 400 <= response.status_code < 500:
             msg = self.response_error_message(response)
             raise FatalAPIError(msg)
 
@@ -240,7 +241,9 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
         return decorator
 
     def _request(
-        self, prepared_request: requests.PreparedRequest, context: dict | None
+        self,
+        prepared_request: requests.PreparedRequest,
+        context: dict | None,
     ) -> requests.Response:
         """TODO.
 
@@ -265,7 +268,9 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
         return response
 
     def get_url_params(
-        self, context: dict | None, next_page_token: _TToken | None
+        self,
+        context: dict | None,
+        next_page_token: _TToken | None,
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -307,7 +312,9 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
         return self.requests_session.prepare_request(request)
 
     def prepare_request(
-        self, context: dict | None, next_page_token: _TToken | None
+        self,
+        context: dict | None,
+        next_page_token: _TToken | None,
     ) -> requests.PreparedRequest:
         """Prepare a request object for this stream.
 
@@ -462,7 +469,9 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
         return {}
 
     def prepare_request_payload(
-        self, context: dict | None, next_page_token: _TToken | None
+        self,
+        context: dict | None,
+        next_page_token: _TToken | None,
     ) -> dict | None:
         """Prepare the data payload for the REST API request.
 
@@ -476,11 +485,7 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
             context: Stream partition or context dictionary.
             next_page_token: Token, page number or any request argument to request the
                 next page of data.
-
-        Returns:
-            Dictionary with the body to use for the request.
         """
-        return None
 
     def get_new_paginator(self) -> BaseAPIPaginator:
         """Get a fresh paginator for this API endpoint.
@@ -491,15 +496,16 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
         if hasattr(self, "get_next_page_token"):
             warn(
                 "`RESTStream.get_next_page_token` is deprecated and will not be used "
-                + "in a future version of the Meltano Singer SDK. "
-                + "Override `RESTStream.get_new_paginator` instead.",
+                "in a future version of the Meltano Singer SDK. "
+                "Override `RESTStream.get_new_paginator` instead.",
                 DeprecationWarning,
             )
             return LegacyStreamPaginator(self)  # type: ignore
-        elif self.next_page_token_jsonpath:
+
+        if self.next_page_token_jsonpath:
             return JSONPathPaginator(self.next_page_token_jsonpath)
-        else:
-            return SimpleHeaderPaginator("X-Next-Page")
+
+        return SimpleHeaderPaginator("X-Next-Page")
 
     @property
     def http_headers(self) -> dict:
@@ -629,11 +635,13 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
         logging.error(
             "Backing off {wait:0.1f} seconds after {tries} tries "
             "calling function {target} with args {args} and kwargs "
-            "{kwargs}".format(**details)
+            "{kwargs}".format(**details),
         )
 
     def backoff_runtime(
-        self, *, value: Callable[[Any], int]
+        self,
+        *,
+        value: Callable[[Any], int],
     ) -> Generator[int, None, None]:
         """Optional backoff wait generator that can replace the default `backoff.expo`.
 

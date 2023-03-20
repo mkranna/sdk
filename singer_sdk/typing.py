@@ -165,7 +165,7 @@ class JSONTypeHelper:
         Raises:
             NotImplementedError: If the derived class does not override this method.
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def to_dict(self) -> dict:
         """Convert to dictionary.
@@ -445,8 +445,8 @@ class Property(JSONTypeHelper, Generic[W]):
         if isinstance(wrapped, type) and not isinstance(wrapped.type_dict, Mapping):
             raise ValueError(
                 f"Type dict for {wrapped} is not defined. "
-                + "Try instantiating it with a nested type such as "
-                + f"{wrapped.__name__}(StringType)."
+                "Try instantiating it with a nested type such as "
+                f"{wrapped.__name__}(StringType).",
             )
 
         return cast(dict, wrapped.type_dict)
@@ -469,7 +469,7 @@ class Property(JSONTypeHelper, Generic[W]):
                 {
                     JSONSCHEMA_ANNOTATION_SECRET: True,
                     JSONSCHEMA_ANNOTATION_WRITEONLY: True,
-                }
+                },
             )
         if self.allowed_values:
             type_dict.update({"enum": self.allowed_values})
@@ -683,7 +683,8 @@ def to_jsonschema_type(
     elif isinstance(from_type, sqlalchemy.types.TypeEngine):
         type_name = type(from_type).__name__
     elif isinstance(from_type, type) and issubclass(
-        from_type, sqlalchemy.types.TypeEngine
+        from_type,
+        sqlalchemy.types.TypeEngine,
     ):
         type_name = from_type.__name__
     else:

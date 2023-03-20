@@ -34,8 +34,8 @@ class SelectionMask(t.Dict[Breadcrumb, bool]):
         if len(breadcrumb) >= 2:
             parent = breadcrumb[:-2]
             return self[parent]
-        else:
-            return True
+
+        return True
 
 
 @dataclass
@@ -67,7 +67,7 @@ class Metadata:
             **{
                 object_field.name: value.get(object_field.name.replace("_", "-"))
                 for object_field in fields(cls)
-            }
+            },
         )
 
     def to_dict(self) -> dict[str, t.Any]:

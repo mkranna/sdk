@@ -174,20 +174,19 @@ def docs_serve(session: Session) -> None:
     session.run("sphinx-autobuild", *args)
 
 
-@session(python=main_python_version)
-def test_cookiecutter(session: Session) -> None:
+@nox.parametrize('replay_file_path', glob.glob('./e2e-tests/cookiecutters/*.json'))
+@session(python="3.10")
+def test_cookiecutter(session: Session, replay_file_path) -> None:
     """Uses the tap template to build an empty cookiecutter, and runs the lint task on the created test project."""
-    args = session.posargs or [
-        "./cookiecutter/tap-template",
-        "./e2e-tests/cookiecutters/tap-rest-api_key-github.json"
-    ]
-    if len(args) == 1:
-        print("ERROR:" + args[0])
-        return
+    args = session.posargs or [1]
 
     cc_build_path = "/tmp"
-    tap_template = os.path.abspath(args[0])
-    replay_file = os.path.abspath(args[1])
+    folder_base_path = "./cookiecutter"
+
+    target_folder = "tap-template" if os.path.basename(
+        replay_file_path).startswith("tap") else "target_template"
+    tap_template = os.path.abspath(folder_base_path + "/" + target_folder)
+    replay_file = os.path.abspath(replay_file_path)
 
     if not os.path.exists(tap_template):
         print("Tap template folder not found")
@@ -198,7 +197,7 @@ def test_cookiecutter(session: Session) -> None:
         return
 
     sdk_dir = os.path.dirname(os.path.dirname(tap_template))
-    cc_output_dir = os.path.basename(args[1]).replace(".json", "")
+    cc_output_dir = os.path.basename(replay_file_path).replace(".json", "")
     cc_test_output = (cc_build_path + "/" + cc_output_dir)
 
     if os.path.exists(cc_test_output):
@@ -224,5 +223,5 @@ def test_cookiecutter(session: Session) -> None:
     for argument in ["black", "isort", "flake8", "mypy"]:
         session.run("poetry", "run", argument, library_name, external=True)
 
-    if len(args) < 3 or int(args[2]) == 1:
+    if int(args[0]) == 1:
         session.run("poetry", "run", "tox", "-e", "lint", external=True)

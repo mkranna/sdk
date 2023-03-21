@@ -6,12 +6,11 @@ import copy
 import io
 import json
 import logging
+import typing as t
 from contextlib import redirect_stdout
-from pathlib import Path
 
 import pytest
 from freezegun import freeze_time
-from pytest_snapshot.plugin import Snapshot
 
 from singer_sdk._singerlib import Catalog
 from singer_sdk.exceptions import MapExpressionError
@@ -26,6 +25,11 @@ from singer_sdk.typing import (
     Property,
     StringType,
 )
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
+
+    from pytest_snapshot.plugin import Snapshot
 
 
 @pytest.fixture
@@ -214,7 +218,7 @@ def clone_and_alias_stream_maps():
 
 
 @pytest.fixture
-def cloned_and_aliased_result(stream_map_config, sample_stream):
+def cloned_and_aliased_result(sample_stream):
     return {
         "repositories_aliased": sample_stream["repositories"],
         "repositories_clone_1": sample_stream["repositories"],
@@ -415,7 +419,7 @@ class MappedStream(Stream):
         ),
     ).to_dict()
 
-    def get_records(self, context):
+    def get_records(self, context):  # noqa: ARG002
         yield {
             "email": "alice@example.com",
             "count": 21,

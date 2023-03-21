@@ -238,6 +238,9 @@ select = [
     "PT",   # flake8-pytest-style
     "RSE",  # flake8-raise
     "RET",  # flake8-return
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+    "ARG",  # flake8-unused-arguments
 ]
 src = ["samples", "singer_sdk", "tests"]
 target-version = "py37"

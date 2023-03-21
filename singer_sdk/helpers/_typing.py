@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import copy
 import datetime
-import logging
 from enum import Enum
 from functools import lru_cache
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import pendulum
+
+if TYPE_CHECKING:
+    import logging
 
 _MAX_TIMESTAMP = "9999-12-31 23:59:59.999999"
 _MAX_TIME = "23:59:59.999999"
@@ -124,10 +126,7 @@ def is_datetime_type(type_dict: dict) -> bool:
             "Did you forget to define a property in the stream schema?",
         )
     if "anyOf" in type_dict:
-        for type_dict in type_dict["anyOf"]:
-            if is_datetime_type(type_dict):
-                return True
-        return False
+        return any(is_datetime_type(type_dict) for type_dict in type_dict["anyOf"])
     if "type" in type_dict:
         return type_dict.get("format") == "date-time"
     raise ValueError(
@@ -188,7 +187,7 @@ def _is_string_with_format(type_dict):
 
 
 def handle_invalid_timestamp_in_record(
-    record,
+    record,  # noqa: ARG001
     key_breadcrumb: list[str],
     invalid_value: str,
     datelike_typename: str,

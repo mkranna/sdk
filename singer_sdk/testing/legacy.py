@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import io
 from contextlib import redirect_stderr, redirect_stdout
-from typing import Callable, cast
+from typing import TYPE_CHECKING, Callable, cast
 
 import singer_sdk._singerlib as singer
-from singer_sdk.mapper_base import InlineMapper
-from singer_sdk.tap_base import Tap
-from singer_sdk.target_base import Target
+
+if TYPE_CHECKING:
+    from singer_sdk.mapper_base import InlineMapper
+    from singer_sdk.tap_base import Tap
+    from singer_sdk.target_base import Target
 
 
 def get_standard_tap_tests(
@@ -94,8 +96,8 @@ def get_standard_tap_tests(
 
 
 def get_standard_target_tests(
-    target_class: type[Target],
-    config: dict | None = None,
+    target_class: type[Target],  # noqa: ARG001
+    config: dict | None = None,  # noqa: ARG001
 ) -> list[Callable]:
     """Return callable pytest which executes simple discovery and connection tests.
 

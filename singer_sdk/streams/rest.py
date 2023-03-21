@@ -5,8 +5,6 @@ from __future__ import annotations
 import abc
 import copy
 import logging
-import sys
-from datetime import datetime
 from typing import TYPE_CHECKING, Any, Callable, Generator, Generic, Iterable, TypeVar
 from urllib.parse import urlparse
 from warnings import warn
@@ -15,7 +13,6 @@ import backoff
 import requests
 
 from singer_sdk import metrics
-from singer_sdk._singerlib import Schema
 from singer_sdk.authenticators import SimpleAuthenticator
 from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 from singer_sdk.helpers.jsonpath import extract_jsonpath
@@ -25,16 +22,21 @@ from singer_sdk.pagination import (
     LegacyStreamPaginator,
     SimpleHeaderPaginator,
 )
-from singer_sdk.plugin_base import PluginBase as TapBaseClass
 from singer_sdk.streams.core import Stream
 
-if sys.version_info >= (3, 10):
-    from typing import TypeAlias
-else:
-    from typing_extensions import TypeAlias
-
 if TYPE_CHECKING:
+    import sys
+    from datetime import datetime
+
     from backoff.types import Details
+
+    from singer_sdk._singerlib import Schema
+    from singer_sdk.plugin_base import PluginBase as TapBaseClass
+
+    if sys.version_info >= (3, 10):
+        from typing import TypeAlias
+    else:
+        from typing_extensions import TypeAlias
 
 DEFAULT_PAGE_SIZE = 1000
 DEFAULT_REQUEST_TIMEOUT = 300  # 5 minutes
@@ -103,11 +105,7 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
         Returns:
             TODO
         """
-        if isinstance(val, str):
-            result = val.replace("/", "%2F")
-        else:
-            result = str(val)
-        return result
+        return val.replace("/", "%2F") if isinstance(val, str) else str(val)
 
     def get_url(self, context: dict | None) -> str:
         """Get stream entity URL.
@@ -199,10 +197,7 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
             str: The error message
         """
         full_path = urlparse(response.url).path or self.path
-        if 400 <= response.status_code < 500:
-            error_type = "Client"
-        else:
-            error_type = "Server"
+        error_type = "Client" if 400 <= response.status_code < 500 else "Server"
 
         return (
             f"{response.status_code} {error_type} Error: "
@@ -269,8 +264,8 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: _TToken | None,
+        context: dict | None,  # noqa: ARG002
+        next_page_token: _TToken | None,  # noqa: ARG002
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
@@ -376,7 +371,7 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
 
     def _write_request_duration_log(
         self,
-        endpoint: str,
+        endpoint: str,  # noqa: ARG002
         response: requests.Response,
         context: dict | None,
         extra_tags: dict | None,
@@ -399,7 +394,7 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
             value=response.elapsed.total_seconds(),
             tags={
                 metrics.Tag.STREAM: self.name,
-                metrics.Tag.ENDPOINT: self.path,
+                metrics.Tag.ENDPOINT: endpoint,
                 metrics.Tag.HTTP_STATUS_CODE: response.status_code,
                 metrics.Tag.STATUS: (
                     metrics.Status.SUCCEEDED
@@ -430,8 +425,7 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
         """
         call_costs = self.calculate_sync_cost(request, response, context)
         self._sync_costs = {
-            k: self._sync_costs.get(k, 0) + call_costs.get(k, 0)
-            for k in call_costs.keys()
+            k: self._sync_costs.get(k, 0) + call_costs.get(k, 0) for k in call_costs
         }
         return self._sync_costs
 
@@ -439,9 +433,9 @@ class RESTStream(Stream, Generic[_TToken], metaclass=abc.ABCMeta):
 
     def calculate_sync_cost(
         self,
-        request: requests.PreparedRequest,
-        response: requests.Response,
-        context: dict | None,
+        request: requests.PreparedRequest,  # noqa: ARG002
+        response: requests.Response,  # noqa: ARG002
+        context: dict | None,  # noqa: ARG002
     ) -> dict[str, int]:
         """Calculate the cost of the last API call made.
 

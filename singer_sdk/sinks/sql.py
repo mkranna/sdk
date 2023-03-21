@@ -6,18 +6,21 @@ import re
 from collections import defaultdict
 from copy import copy
 from textwrap import dedent
-from typing import Any, Iterable
+from typing import TYPE_CHECKING, Any, Iterable
 
 import sqlalchemy
 from pendulum import now
-from sqlalchemy.sql import Executable
 from sqlalchemy.sql.expression import bindparam
 
 from singer_sdk.connectors import SQLConnector
 from singer_sdk.exceptions import ConformedNameClashException
 from singer_sdk.helpers._conformers import replace_leading_digit
-from singer_sdk.plugin_base import PluginBase
 from singer_sdk.sinks.batch import BatchSink
+
+if TYPE_CHECKING:
+    from sqlalchemy.sql import Executable
+
+    from singer_sdk.plugin_base import PluginBase
 
 
 class SQLSink(BatchSink):
@@ -133,7 +136,11 @@ class SQLSink(BatchSink):
             db_name=self.database_name,
         )
 
-    def conform_name(self, name: str, object_type: str | None = None) -> str:
+    def conform_name(
+        self,
+        name: str,
+        object_type: str | None = None,  # noqa: ARG002
+    ) -> str:
         """Conform a stream property name to one suitable for the target system.
 
         Transforms names to snake case by default, applicable to most common DBMSs'.
@@ -199,7 +206,7 @@ class SQLSink(BatchSink):
         """
         conformed_schema = copy(schema)
         conformed_property_names = {
-            key: self.conform_name(key) for key in conformed_schema["properties"].keys()
+            key: self.conform_name(key) for key in conformed_schema["properties"]
         }
         self._check_conformed_names_not_duplicated(conformed_property_names)
         conformed_schema["properties"] = {

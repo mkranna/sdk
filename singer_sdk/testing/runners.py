@@ -7,11 +7,13 @@ import io
 import json
 from collections import defaultdict
 from contextlib import redirect_stderr, redirect_stdout
-from pathlib import Path
-from typing import IO, Any, cast
+from typing import IO, TYPE_CHECKING, Any, cast
 
 from singer_sdk import Tap, Target
 from singer_sdk.testing.config import SuiteConfig
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class SingerTestRunner(metaclass=abc.ABCMeta):
@@ -130,7 +132,7 @@ class TapTestRunner(SingerTestRunner):
         """
         return self.tap.run_connection_test()
 
-    def sync_all(self, **kwargs: Any) -> None:
+    def sync_all(self, **kwargs: Any) -> None:  # noqa: ARG002
         """Run a full tap sync, assigning output to the runner object.
 
         Args:
@@ -231,14 +233,14 @@ class TargetTestRunner(SingerTestRunner):
             if self.input_io:
                 self._input = self.input_io
             elif self.input_filepath:
-                self._input = open(self.input_filepath)
+                self._input = open(self.input_filepath)  # noqa: SIM115
         return cast(IO[str], self._input)
 
     @input.setter
     def input(self, value: IO[str]) -> None:
         self._input = value
 
-    def sync_all(self, finalize: bool = True, **kwargs: Any) -> None:
+    def sync_all(self, finalize: bool = True, **kwargs: Any) -> None:  # noqa: ARG002
         """Run a full tap sync, assigning output to the runner object.
 
         Args:

@@ -8,11 +8,19 @@ import datetime
 import gzip
 import itertools
 import json
-import logging
 from os import PathLike
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Generator, Iterable, Iterator, Mapping, TypeVar, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Generator,
+    Iterable,
+    Iterator,
+    Mapping,
+    TypeVar,
+    cast,
+)
 from uuid import uuid4
 
 import pendulum
@@ -46,7 +54,11 @@ from singer_sdk.helpers._typing import (
 )
 from singer_sdk.helpers._util import utc_now
 from singer_sdk.mapper import RemoveRecordTransform, SameRecordTransform, StreamMap
-from singer_sdk.plugin_base import PluginBase as TapBaseClass
+
+if TYPE_CHECKING:
+    import logging
+
+    from singer_sdk.plugin_base import PluginBase as TapBaseClass
 
 # Replication methods
 REPLICATION_FULL_TABLE = "FULL_TABLE"
@@ -390,7 +402,7 @@ class Stream(metaclass=abc.ABCMeta):
 
     def get_replication_key_signpost(
         self,
-        context: dict | None,
+        context: dict | None,  # noqa: ARG002
     ) -> datetime.datetime | Any | None:
         """Get the replication signpost.
 
@@ -1266,17 +1278,23 @@ class Stream(metaclass=abc.ABCMeta):
         ):
             filename = f"{prefix}{sync_id}-{i}.json.gz"
             with batch_config.storage.fs() as fs:
-                with fs.open(filename, "wb") as f:
-                    # TODO: Determine compression from config.
-                    with gzip.GzipFile(fileobj=f, mode="wb") as gz:
-                        gz.writelines(
-                            (json.dumps(record) + "\n").encode() for record in chunk
-                        )
+                # TODO: Determine compression from config.
+                with fs.open(filename, "wb") as f, gzip.GzipFile(
+                    fileobj=f,
+                    mode="wb",
+                ) as gz:
+                    gz.writelines(
+                        (json.dumps(record) + "\n").encode() for record in chunk
+                    )
                 file_url = fs.geturl(filename)
 
             yield batch_config.encoding, [file_url]
 
-    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
+    def post_process(
+        self,
+        row: dict,
+        context: dict | None = None,  # noqa: ARG002
+    ) -> dict | None:
         """As needed, append or transform raw data to match expected structure.
 
         Optional. This method gives developers an opportunity to "clean up" the results

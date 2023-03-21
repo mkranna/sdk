@@ -235,5 +235,7 @@ jobs:
         nox --version
       
     - name: Run Nox
+      env:
+        PIP_CONSTRAINT: .github/workflows/constraints.txt
       run: |
-        nox --python=${{ matrix.python-version }} --session=test_cookiecutter
+        nox --python=${{ matrix.python-version }} --session=test_cookiecutter 0

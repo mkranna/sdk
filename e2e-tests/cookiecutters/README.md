@@ -15,3 +15,5 @@ Run a test against tap-template cookiecutter against the `tap-rest-api_key-githu
 bash test_cookiecutter.sh ../../cookiecutter/tap-template ./tap-rest-api_key-github.json
 bash test_cookiecutter.sh ../../cookiecutter/target-template ./target-per_record.json
 ```
+
+

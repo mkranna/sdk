@@ -7,13 +7,11 @@ import io
 import json
 from collections import defaultdict
 from contextlib import redirect_stderr, redirect_stdout
-from typing import IO, TYPE_CHECKING, Any, cast
+from pathlib import Path
+from typing import IO, Any, cast
 
 from singer_sdk import Tap, Target
 from singer_sdk.testing.config import SuiteConfig
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 class SingerTestRunner(metaclass=abc.ABCMeta):
@@ -223,7 +221,7 @@ class TargetTestRunner(SingerTestRunner):
         return cast(Target, self.create())
 
     @property
-    def input(self) -> IO[str]:
+    def target_input(self) -> IO[str]:
         """Input messages to pass to Target.
 
         Returns:
@@ -233,11 +231,11 @@ class TargetTestRunner(SingerTestRunner):
             if self.input_io:
                 self._input = self.input_io
             elif self.input_filepath:
-                self._input = open(self.input_filepath)  # noqa: SIM115
+                self._input = Path(self.input_filepath).open()  # noqa: SIM115
         return cast(IO[str], self._input)
 
-    @input.setter
-    def input(self, value: IO[str]) -> None:
+    @target_input.setter
+    def target_input(self, value: IO[str]) -> None:
         self._input = value
 
     def sync_all(self, finalize: bool = True, **kwargs: Any) -> None:  # noqa: ARG002
@@ -251,7 +249,7 @@ class TargetTestRunner(SingerTestRunner):
         target = cast(Target, self.create())
         stdout, stderr = self._execute_sync(
             target=target,
-            input=self.input,
+            target_input=self.target_input,
             finalize=finalize,
         )
         self.stdout, self.stderr = (stdout.read(), stderr.read())
@@ -260,14 +258,14 @@ class TargetTestRunner(SingerTestRunner):
     def _execute_sync(
         self,
         target: Target,
-        input: IO[str],
+        target_input: IO[str],
         finalize: bool = True,
     ) -> tuple[io.StringIO, io.StringIO]:
         """Invoke the target with the provided input.
 
         Args:
             target: Target to sync.
-            input: The input to process as if from STDIN.
+            target_input: The input to process as if from STDIN.
             finalize: True to process as the end of stream as a completion signal;
                 False to keep the sink operation open for further records.
 
@@ -279,8 +277,8 @@ class TargetTestRunner(SingerTestRunner):
         stderr_buf = io.StringIO()
 
         with redirect_stdout(stdout_buf), redirect_stderr(stderr_buf):
-            if input is not None:
-                target._process_lines(input)
+            if target_input is not None:
+                target._process_lines(target_input)
             if finalize:
                 target._process_endofpipe()
 

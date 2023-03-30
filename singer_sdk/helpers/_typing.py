@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 _MAX_TIMESTAMP = "9999-12-31 23:59:59.999999"
 _MAX_TIME = "23:59:59.999999"
-JSONSCHEMA_ANNOTATION_SECRET = "secret"
+JSONSCHEMA_ANNOTATION_SECRET = "secret"  # noqa: S105
 JSONSCHEMA_ANNOTATION_WRITEONLY = "writeOnly"
 
 
@@ -149,10 +149,7 @@ def is_date_or_datetime_type(type_dict: dict) -> bool:
         True if date or date-time, else False.
     """
     if "anyOf" in type_dict:
-        for type_dict in type_dict["anyOf"]:
-            if is_date_or_datetime_type(type_dict):
-                return True
-        return False
+        return any(is_date_or_datetime_type(option) for option in type_dict["anyOf"])
 
     if "type" in type_dict:
         return type_dict.get("format") in {"date", "date-time"}
@@ -252,7 +249,7 @@ def is_boolean_type(property_schema: dict) -> bool | None:
         return None  # Could not detect data type
     for property_type in property_schema.get("anyOf", [property_schema.get("type")]):
         if isinstance(property_type, dict):
-            property_type = property_type.get("type")
+            property_type = property_type.get("type", [])
         if "boolean" in property_type or property_type == "boolean":
             return True
     return False
@@ -264,7 +261,7 @@ def is_integer_type(property_schema: dict) -> bool | None:
         return None  # Could not detect data type
     for property_type in property_schema.get("anyOf", [property_schema.get("type")]):
         if isinstance(property_type, dict):
-            property_type = property_type.get("type")
+            property_type = property_type.get("type", [])
         if "integer" in property_type or property_type == "integer":
             return True
     return False
@@ -276,7 +273,7 @@ def is_string_type(property_schema: dict) -> bool | None:
         return None  # Could not detect data type
     for property_type in property_schema.get("anyOf", [property_schema.get("type")]):
         if isinstance(property_type, dict):
-            property_type = property_type.get("type")
+            property_type = property_type.get("type", [])
         if "string" in property_type or property_type == "string":
             return True
     return False
@@ -288,7 +285,7 @@ def is_null_type(property_schema: dict) -> bool | None:
         return None  # Could not detect data type
     for property_type in property_schema.get("anyOf", [property_schema.get("type")]):
         if isinstance(property_type, dict):
-            property_type = property_type.get("type")
+            property_type = property_type.get("type", [])
         if "null" in property_type or property_type == "null":
             return True
     return False
@@ -300,7 +297,7 @@ def is_number_type(property_schema: dict) -> bool | None:
         return None  # Could not detect data type
     for property_type in property_schema.get("anyOf", [property_schema.get("type")]):
         if isinstance(property_type, dict):
-            property_type = property_type.get("type")
+            property_type = property_type.get("type", [])
         if "number" in property_type or property_type == "number":
             return True
     return False

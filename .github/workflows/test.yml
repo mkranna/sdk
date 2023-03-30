@@ -197,7 +197,7 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - {session: test_cookiecutter, python-version: "3.10",  os: "ubuntu-latest", replay: "tap-graphql-jwt.json" }
+          - {session: "test_cookiecutter(replay_file_path='./e2e-tests/cookiecutters/tap-rest-api_key-github.json')", python-version: "3.10",  os: "ubuntu-latest" }
 
     steps:
     - name: Check out the repository
@@ -238,4 +238,4 @@ jobs:
       env:
         PIP_CONSTRAINT: .github/workflows/constraints.txt
       run: |
-        nox --python=${{ matrix.python-version }} --session "test_cookiecutter(replay_file_path='./e2e-tests/cookiecutters/tap-rest-api_key-github.json')"
+        nox --python=${{ matrix.python-version }} 

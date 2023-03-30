@@ -198,7 +198,17 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          - {session: "test_cookiecutter(replay_file_path='./e2e-tests/cookiecutters/tap-graphql-jwt.json')", python-version: "3.10",  os: "ubuntu-latest" }
           - {session: "test_cookiecutter(replay_file_path='./e2e-tests/cookiecutters/tap-rest-api_key-github.json')", python-version: "3.10",  os: "ubuntu-latest" }
+          - {session: "test_cookiecutter(replay_file_path='./e2e-tests/cookiecutters/tap-rest-basic_auth.json')", python-version: "3.10",  os: "ubuntu-latest" }
+          - {session: "test_cookiecutter(replay_file_path='./e2e-tests/cookiecutters/tap-rest-bearer_token.json')", python-version: "3.10",  os: "ubuntu-latest" }
+          - {session: "test_cookiecutter(replay_file_path='./e2e-tests/cookiecutters/tap-rest-custom.json')", python-version: "3.10",  os: "ubuntu-latest" }
+          - {session: "test_cookiecutter(replay_file_path='./e2e-tests/cookiecutters/tap-rest-jwt.json')", python-version: "3.10",  os: "ubuntu-latest" }
+          - {session: "test_cookiecutter(replay_file_path='./e2e-tests/cookiecutters/tap-rest-oauth2.json')", python-version: "3.10",  os: "ubuntu-latest" }
+          - {session: "test_cookiecutter(replay_file_path='./e2e-tests/cookiecutters/tap-other-custom.json')", python-version: "3.10",  os: "ubuntu-latest" }
+          - {session: "test_cookiecutter(replay_file_path='./e2e-tests/cookiecutters/tap-sql-custom.json')", python-version: "3.10",  os: "ubuntu-latest" }
+          - {session: "test_cookiecutter(replay_file_path='./e2e-tests/cookiecutters/target-per_record.json')", python-version: "3.10",  os: "ubuntu-latest" }
+
 
     steps:
     - name: Check out the repository

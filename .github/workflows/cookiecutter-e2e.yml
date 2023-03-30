@@ -63,3 +63,11 @@ jobs:
     - name: Run Nox
       run: |
         nox --python=${{ matrix.python-version }} --session=test_cookiecutter
+
+    - name: Upload build artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        path: |
+          /tmp/[tap,target]*
+          !/tmp/**/.mypy_cache/

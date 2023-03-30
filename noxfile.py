@@ -184,7 +184,7 @@ def test_cookiecutter(session: Session, replay_file_path) -> None:
     folder_base_path = "./cookiecutter"
 
     target_folder = "tap-template" if os.path.basename(
-        replay_file_path).startswith("tap") else "target_template"
+        replay_file_path).startswith("tap") else "target-template"
     tap_template = os.path.abspath(folder_base_path + "/" + target_folder)
     replay_file = os.path.abspath(replay_file_path)
 

@@ -188,6 +188,7 @@ jobs:
     - name: Upload coverage report
       uses: codecov/codecov-action@v3.1.1
   
+  
   lint:
     name: Lint ${{ matrix.cookiecutter }}, Replay ${{ matrix.replay }} on ${{ matrix.python-version }} ${{ matrix.python-version }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -210,7 +211,6 @@ jobs:
         pipx install poetry
         poetry --version
         pipx install tox
-
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4.5.0
       with:
@@ -225,7 +225,6 @@ jobs:
       run: |
         pip install pip
         pip --version
-
     - name: Install Nox
       env:
         PIP_CONSTRAINT: .github/workflows/constraints.txt
@@ -235,7 +234,5 @@ jobs:
         nox --version
       
     - name: Run Nox
-      env:
-        PIP_CONSTRAINT: .github/workflows/constraints.txt
       run: |
-        nox --python=${{ matrix.python-version }} 
+        nox --python=${{ matrix.python-version }}

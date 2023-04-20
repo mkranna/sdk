@@ -63,7 +63,10 @@ class Sink(metaclass=abc.ABCMeta):
         self._config = dict(target.config)
         self._pending_batch: dict | None = None
         self.stream_name = stream_name
-        self.logger.info(f"Initializing target sink for stream '{stream_name}'...")
+        self.logger.info(
+            "Initializing target sink for stream '%s'...",
+            stream_name,
+        )
         self.schema = schema
         if self.include_sdc_metadata_properties:
             self._add_sdc_metadata_to_schema()
@@ -492,9 +495,15 @@ class Sink(metaclass=abc.ABCMeta):
                     tail,
                     mode="rb",
                 ) as file:
-                    if encoding.compression == "gzip":
-                        file = gzip_open(file)
-                    context = {"records": [json.loads(line) for line in file]}
+                    open_file = (
+                        gzip_open(file) if encoding.compression == "gzip" else file
+                    )
+                    context = {
+                        "records": [
+                            json.loads(line)
+                            for line in open_file  # type: ignore[attr-defined]
+                        ],
+                    }
                     self.process_batch(context)
             else:
                 raise NotImplementedError(
